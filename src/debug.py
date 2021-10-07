@@ -4,7 +4,7 @@
 '''
 
 def debug_msg():
-    return "Debug message!"
+    print("Debug message!")
 
 def sum(a,b):
     try:
