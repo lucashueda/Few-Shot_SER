@@ -60,6 +60,10 @@ class Dataloader4SER(data.Dataset):
         # mel = prepare_tensor(mel, 1)
         mel = mel.transpose(1, 0)
 
+
+        # log mel  
+        mel = np.log(mel)
+
         # pad mel
         if(mel_lengths >= self.pad_to):
             mel = mel[:self.pad_to, :]
