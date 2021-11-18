@@ -19,9 +19,10 @@ class Dataloader4SER(data.Dataset):
         TODO: Process directly a disered audio transformation
         (instead of pass the raw wav path pass the melspectrogram or the mfccs)
     '''
-    def __init__(self, df_path, ap):
+    def __init__(self, df_path, ap, pad_to=100):
         self.df_path = df_path # Must have wav_path and labels columns
         self.ap = ap
+        self.pad_to = pad_to
 
         self.all_data = pd.read_csv(self.df_path) # Must be comma delimited
 
@@ -58,6 +59,14 @@ class Dataloader4SER(data.Dataset):
 
         # mel = prepare_tensor(mel, 1)
         mel = mel.transpose(1, 0)
+
+        # pad mel
+        if(mel_lengths >= self.pad_to):
+            mel = mel[:self.pad_to, :]
+        else:
+            N = self.pad_to - mel_lengths
+            zeros = np.zeros((N,80))
+            mel = np.concatenate((mel, zeros), axis = 0)
 
         mel = torch.FloatTensor(mel).contiguous()
         mel_lengths = torch.LongTensor(mel_lengths)
