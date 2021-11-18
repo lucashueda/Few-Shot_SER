@@ -68,12 +68,15 @@ class Dataloader4SER(data.Dataset):
             zeros = np.zeros((N,80))
             mel = np.concatenate((mel, zeros), axis = 0)
 
+        # print(mel.shape)
+
+
         mel = torch.FloatTensor(mel).contiguous()
-        mel_lengths = torch.LongTensor(mel_lengths)
+        # mel_lengths = torch.LongTensor(mel_lengths)
 
 
         # return {'wav': w, 'emotion': np.asarray(emotion)}
-        return {'mel': mel, 'mel_len': mel_lengths, 'emotion': emotion}
+        return {'mel': mel, 'emotion': emotion}
 
     def collate_fn(self, batch):
 
