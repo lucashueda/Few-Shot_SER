@@ -209,6 +209,7 @@ class AudioProcessor(object):
         self,
         sample_rate=None,
         resample=False,
+        duration = None,
         num_mels=None,
         log_func="np.log10",
         min_level_db=None,
@@ -242,6 +243,7 @@ class AudioProcessor(object):
         # setup class attributed
         self.sample_rate = sample_rate
         self.resample = resample
+        self.duration = duration
         self.num_mels = num_mels
         self.log_func = log_func
         self.min_level_db = min_level_db or 0
@@ -722,7 +724,7 @@ class AudioProcessor(object):
             np.ndarray: Loaded waveform.
         """
         if self.resample:
-            x, sr = librosa.load(filename, sr=self.sample_rate)
+            x, sr = librosa.load(filename, sr=self.sample_rate, duration = self.duration)
         elif sr is None:
             x, sr = sf.read(filename)
             assert self.sample_rate == sr, "%s vs %s" % (self.sample_rate, sr)
