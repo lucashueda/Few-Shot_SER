@@ -95,7 +95,7 @@ config = [
     ] 
 
 # Loading meta
-maml = Meta(args, config)
+maml = Meta(args, config).to(device)
 maml.net.to(device)
 
 
