@@ -141,4 +141,4 @@ for step in range(args.epoch):
             'model_state_dict': maml.net.state_dict(),
             'loss': maml.loss,
             'best_loss': maml.best_loss,
-            }, args.log_path + f'/checkpoint_epoch{step}_loss{maml.net.loss}.pth')
+            }, args.log_path + f'/checkpoint_epoch{step}_loss{maml.loss}.pth')
