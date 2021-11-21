@@ -68,7 +68,7 @@ class ARGS:
         self.imgc = CHANNEL
         self.epoch = EPOCH
         self.log_path = LOG_PATH
-        self.retore_path = RESTORE_PATH
+        self.restore_path = RESTORE_PATH
     
 args = ARGS()
 
