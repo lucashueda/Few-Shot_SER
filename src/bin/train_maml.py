@@ -21,10 +21,10 @@ K_SPT = 5 # How many examples per class for training (support set)
 K_QRY = 2 # How many example per class for validation (query set)
 TASK_NUM = 16 # How many batches per sampling
 UPDATE_STEP = 5 # How many times perform optimizations in meta stage 
-UPDATE_STEP_TEST = 10 # How many times perform optimization in finetuning stage (test)
+UPDATE_STEP_TEST = 50 # How many times perform optimization in finetuning stage (test)
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
-EPOCH = 1 # How many epochs to run
+EPOCH = 1000 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it" # Path to log the checkpointsmen
 RESTORE_PATH = None
 
@@ -105,6 +105,8 @@ print(maml)
 print('Total trainable tensors:', num)
 
 for step in range(args.epoch):
+
+    print(f"Starting epoch {step}")
 
     x_spt, y_spt, x_qry, y_qry = nshot.next()
     x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device).type(torch.LongTensor), \
