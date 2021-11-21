@@ -4,6 +4,7 @@ from    torch.nn import functional as F
 from    torch import optim
 import  numpy as np
 from    copy import deepcopy
+from src.models.learner import Learner
 
 class Meta(nn.Module):
     """
@@ -23,9 +24,21 @@ class Meta(nn.Module):
         self.task_num = args.task_num
         self.update_step = args.update_step
         self.update_step_test = args.update_step_test
+        self.restore_path = args.restore_path
 
 
         self.net = Learner(config, args.imgc, args.imgsz)
+
+        self.loss = 0
+        self.best_loss = 0
+        self.log_path = args.log_path
+
+        if(self.retore_path is not None):
+            checkpoint = torch.load(self.restore_path)
+            self.net.load_state_dict(checkpoint['model_state_dict'])
+            self.best_loss = checkpoint['best_loss']
+            self.loss = checkpoint['loss']
+
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
 
@@ -127,6 +140,18 @@ class Meta(nn.Module):
         self.meta_optim.zero_grad()
         loss_q.backward()
         self.meta_optim.step()
+
+        # Saving checkpoint
+        self.loss = loss_q 
+        
+        if(self.loss < self.best_loss):
+            self.best_loss = self.loss   
+
+            torch.save({
+            'model_state_dict': self.net.state_dict(),
+            'loss': self.loss,
+            'best_loss': self.best_loss,
+            }, self.log_path)
 
         # Accuracy Calculation
         accs = np.array(corrects) / (querysz * task_num)
