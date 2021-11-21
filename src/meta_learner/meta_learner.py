@@ -33,7 +33,7 @@ class Meta(nn.Module):
         self.best_loss = 0
         self.log_path = args.log_path
 
-        if(self.retore_path is not None):
+        if(self.restore_path is not None):
             checkpoint = torch.load(self.restore_path)
             self.net.load_state_dict(checkpoint['model_state_dict'])
             self.best_loss = checkpoint['best_loss']
