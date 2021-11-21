@@ -109,8 +109,8 @@ for step in range(args.epoch):
     print(f"Starting epoch {step}")
 
     x_spt, y_spt, x_qry, y_qry = nshot.next()
-    x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device).type(torch.LongTensor), \
-                                    torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device).type(torch.LongTensor)
+    x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).type(torch.LongTensor).to(device), \
+                                    torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).type(torch.LongTensor).to(device)
 
     # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
     accs = maml(x_spt, y_spt, x_qry, y_qry)
@@ -123,8 +123,9 @@ for step in range(args.epoch):
         for _ in range(1000//args.task_num):
             # test
             x_spt, y_spt, x_qry, y_qry = nshot.next('test')
-            x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).to(device).type(torch.LongTensor), \
-                                            torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).to(device).type(torch.LongTensor)
+            x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).type(torch.LongTensor).to(device), \
+                                            torch.from_numpy(x_qry).to(device), torch.from_numpy(y_qry).type(torch.LongTensor).to(device)
+
 
             # split to single task each time
             for x_spt_one, y_spt_one, x_qry_one, y_qry_one in zip(x_spt, y_spt, x_qry, y_qry):
