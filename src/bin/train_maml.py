@@ -1,5 +1,5 @@
 import sys
-# sys.path.append("../")
+sys.path.append("/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/")
 
 from src.dataloader.meta_loader import Dataloader4SER, NShotMAMLSampler, SERNShot
 from src.audio.audio import AudioProcessor
