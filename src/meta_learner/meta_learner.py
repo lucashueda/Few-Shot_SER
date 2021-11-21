@@ -151,7 +151,7 @@ class Meta(nn.Module):
             'model_state_dict': self.net.state_dict(),
             'loss': self.loss,
             'best_loss': self.best_loss,
-            }, self.log_path)
+            }, self.log_path + f"/best_model.pth")
 
         # Accuracy Calculation
         accs = np.array(corrects) / (querysz * task_num)

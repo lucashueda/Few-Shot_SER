@@ -26,6 +26,7 @@ MEL_DIM = 80 # MEL DIM
 CHANNEL = 1 # Fixed
 EPOCH = 1 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it" # Path to log the checkpointsmen
+RESTORE_PATH = None
 
 device = 'cuda:0' # 'cpu' if dont have cuda
 
@@ -67,6 +68,7 @@ class ARGS:
         self.imgc = CHANNEL
         self.epoch = EPOCH
         self.log_path = LOG_PATH
+        self.retore_path = RESTORE_PATH
     
 args = ARGS()
 
@@ -136,4 +138,4 @@ for step in range(args.epoch):
             'model_state_dict': maml.net.state_dict(),
             'loss': maml.loss,
             'best_loss': maml.best_loss,
-            }, args.log_path)
+            }, args.log_path + f'/checkpoint_epoch{step}_loss{maml.net.loss}.pth')
