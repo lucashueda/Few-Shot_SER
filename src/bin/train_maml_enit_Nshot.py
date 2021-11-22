@@ -159,6 +159,7 @@ for step in range(args.epoch):
             'model_state_dict': maml.net.state_dict(),
             'loss': maml.loss,
             'best_loss': maml.best_loss,
+            'step': step,
             }, args.log_path + f"/best_model_early_stop.pth")
 
     early_stop_step += 1 
