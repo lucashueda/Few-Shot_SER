@@ -27,7 +27,7 @@ CHANNEL = 1 # Fixed
 EPOCH = 2000 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-it-es" # Path to log the checkpointsmen
 RESTORE_PATH = None
-STEPS_EARLY_STOP = 200
+STEPS_EARLY_STOP = 100
 
 device = 'cuda:0' # 'cpu' if dont have cuda
 
