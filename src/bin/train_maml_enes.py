@@ -109,7 +109,7 @@ import pandas as pd
 results = pd.DataFrame(columns = ['epoch','loss'])
 
 import os
-if(not os.isfile(args.log_path + '/results.csv')):
+if(not os.path.isfile(args.log_path + '/results.csv')):
     results.to_csv(args.log_path + '/results.csv', index = False)
 
 for step in range(args.epoch):
