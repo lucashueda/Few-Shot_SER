@@ -144,7 +144,12 @@ class Meta(nn.Module):
         # Saving checkpoint
         self.loss = loss_q 
         
+        # if first best_loss (=0) then receive the first loss
+        if(self.best_loss == 0):
+            self.best_loss = self.loss
+        
         if(self.loss < self.best_loss):
+            print('New best loss')
             self.best_loss = self.loss   
 
             torch.save({

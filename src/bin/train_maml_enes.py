@@ -18,13 +18,13 @@ UPDATE_LR = 0.01 # Learning rate of fast weight optimizations
 META_LR = 0.001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
 K_SPT = 5 # How many examples per class for training (support set)
-K_QRY = 2 # How many example per class for validation (query set)
+K_QRY = 20 # How many example per class for validation (query set)
 TASK_NUM = 16 # How many batches per sampling
 UPDATE_STEP = 5 # How many times perform optimizations in meta stage 
-UPDATE_STEP_TEST = 50 # How many times perform optimization in finetuning stage (test)
+UPDATE_STEP_TEST = 20 # How many times perform optimization in finetuning stage (test)
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
-EPOCH = 30000 # How many epochs to run
+EPOCH = 10000 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-es" # Path to log the checkpointsmen
 RESTORE_PATH = None
 
@@ -74,25 +74,21 @@ args = ARGS()
 
 # Defining the config of the model
 config = [
-    ('conv2d', [32, 1, 3, 3, 1, 0]),
-    ('relu', [True]),
-    ('bn', [32]),
-    ('max_pool2d', [2, 2, 0]),
-    ('conv2d', [32, 32, 3, 3, 1, 0]),
-    ('relu', [True]),
-    ('bn', [32]),
-    ('max_pool2d', [2, 2, 0]),
-    ('conv2d', [32, 32, 3, 3, 1, 0]),
-    ('relu', [True]),
-    ('bn', [32]),
-    ('max_pool2d', [2, 2, 0]),
-    ('conv2d', [32, 32, 3, 3, 1, 0]),
-    ('relu', [True]),
-    ('bn', [32]),
-    ('max_pool2d', [2, 1, 0]),
-    ('flatten', []),
-    ('linear', [args.n_way, 3200]) # Must fix if you change the default "PAD_TO = 200 and MEL_DIM = 80"
-    ] 
+        ('conv2d', [64, 1, 3, 3, 2, 1]),
+        ('relu', [True]),
+        ('bn', [64]),
+        ('conv2d', [64, 64, 3, 3, 2, 1]),
+        ('relu', [True]),
+        ('bn', [64]),
+        ('conv2d', [64, 64, 3, 3, 2, 1]),
+        ('relu', [True]),
+        ('bn', [64]),
+        ('conv2d', [64, 64, 3, 3, 2, 1]),
+        ('relu', [True]),
+        ('bn', [64]),
+        ('flatten', []),
+        ('linear', [args.n_way, 4160])
+    ]
 
 # Loading meta
 maml = Meta(args, config)
@@ -104,13 +100,7 @@ num = sum(map(lambda x: np.prod(x.shape), tmp))
 print(maml)
 print('Total trainable tensors:', num)
 
-import pandas as pd   
-
-results = pd.DataFrame(columns = ['epoch','loss'])
-
-import os
-if(not os.path.isfile(args.log_path + '/results.csv')):
-    results.to_csv(args.log_path + '/results.csv', index = False)
+losses = []
 
 for step in range(args.epoch):
 
@@ -126,7 +116,7 @@ for step in range(args.epoch):
     if step % 500 == 0:
         print('step:', step, '\ttraining acc:', accs)
 
-    if step % 5000 == 0:
+    if step % 1000 == 0:
         accs = []
         for _ in range(1000//args.task_num):
             # test
@@ -144,16 +134,15 @@ for step in range(args.epoch):
         print('Test acc:', accs) # Each position is the average test acc for each update_step_test (starting in no update i = 0)
 
     # Saving epoch checkpoint  
-    if step % 5000 == 0:
+    if step % 1000 == 0:
         torch.save({
                 'model_state_dict': maml.net.state_dict(),
                 'loss': maml.loss,
                 'best_loss': maml.best_loss,
                 }, args.log_path + f'/checkpoint_epoch{step}_loss{maml.loss}.pth')
 
-    # Save to pandas csv aux
-    results = pd.read_csv(args.log_path + '/results.csv')
-    to_append = [step, maml.loss]
-    a_series = pd.Series(to_append, index = results.columns)
-    results = results.append(a_series, ignore_index=True)
-    results.to_csv(args.log_path + '/results.csv', index = False)
+    losses.append(maml.loss)
+
+import pandas as pd
+loss_df = pd.DataFrame({'losses': losses})
+loss_df.to_csv('losses.csv', index = False)
