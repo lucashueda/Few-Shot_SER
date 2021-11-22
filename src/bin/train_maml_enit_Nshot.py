@@ -24,7 +24,7 @@ UPDATE_STEP = 5 # How many times perform optimizations in meta stage
 UPDATE_STEP_TEST = 20 # How many times perform optimization in finetuning stage (test)
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
-EPOCH = 10000 # How many epochs to run
+EPOCH = 2000 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it" # Path to log the checkpointsmen
 RESTORE_PATH = None
 STEPS_EARLY_STOP = 100
@@ -167,8 +167,8 @@ for step in range(args.epoch):
         print(f"Early stop achieved on step {step}.")
         early_stop = True
 
-    losses.append(maml.loss)
+    losses.append(maml.loss.item())
 
 import pandas as pd
 loss_df = pd.DataFrame({'losses': losses})
-loss_df.to_csv('losses.csv', index = False)
+loss_df.to_csv(args.log_path + '/losses.csv', index = False)
