@@ -12,8 +12,8 @@ import numpy as np
 # DEFINING EXPERIMENT PARAMETERS
 PAD_TO = 200 
 PAD_VALUE = -3
-TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
-TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it/test.csv' # The same as training but with only data from the out-of-distribution language
+TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-es/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
+TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-es/test.csv' # The same as training but with only data from the out-of-distribution language
 UPDATE_LR = 0.01 # Learning rate of fast weight optimizations
 META_LR = 0.001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
@@ -25,8 +25,9 @@ UPDATE_STEP_TEST = 20 # How many times perform optimization in finetuning stage 
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
 EPOCH = 10000 # How many epochs to run
-LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it" # Path to log the checkpointsmen
+LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-es" # Path to log the checkpointsmen
 RESTORE_PATH = None
+STEPS_EARLY_STOP = 100
 
 device = 'cuda:0' # 'cpu' if dont have cuda
 
@@ -91,7 +92,7 @@ config = [
     ]
 
 # Loading meta
-maml = Meta(args, config).to(device)
+maml = Meta(args, config)
 maml.net.to(device)
 
 
@@ -101,6 +102,11 @@ print(maml)
 print('Total trainable tensors:', num)
 
 losses = []
+
+
+early_stop_best_loss = 0 
+early_stop_step = 0
+early_stop = False
 
 for step in range(args.epoch):
 
@@ -134,12 +140,33 @@ for step in range(args.epoch):
         print('Test acc:', accs) # Each position is the average test acc for each update_step_test (starting in no update i = 0)
 
     # Saving epoch checkpoint  
-    if step % 1000 == 0:
+    if step % 500 == 0:
         torch.save({
                 'model_state_dict': maml.net.state_dict(),
                 'loss': maml.loss,
                 'best_loss': maml.best_loss,
                 }, args.log_path + f'/checkpoint_epoch{step}_loss{maml.loss}.pth')
+
+    # if first best_loss (=0) then receive the first loss
+    if(early_stop_best_loss == 0):
+        early_stop_best_loss = maml.loss
+    
+    if(not early_stop):
+        if(maml.loss < early_stop_best_loss):
+            # print('New best loss')
+            early_stop_best_loss = maml.loss   
+            early_stop_step = 0
+            torch.save({
+            'model_state_dict': maml.net.state_dict(),
+            'loss': maml.loss,
+            'best_loss': maml.best_loss,
+            }, args.log_path + f"/best_model_early_stop.pth")
+
+    early_stop_step += 1 
+
+    if(early_stop_step > STEPS_EARLY_STOP):
+        print(f"Early stop achieved on step {step}.")
+        early_stop = True
 
     losses.append(maml.loss)
 
