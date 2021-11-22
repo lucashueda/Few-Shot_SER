@@ -14,7 +14,7 @@ PAD_TO = 200
 PAD_VALUE = -3
 TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
 TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it/test.csv' # The same as training but with only data from the out-of-distribution language
-UPDATE_LR = 0.4 # Learning rate of fast weight optimizations
+UPDATE_LR = 0.01 # Learning rate of fast weight optimizations
 META_LR = 0.001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
 K_SPT = 5 # How many examples per class for training (support set)
@@ -24,7 +24,7 @@ UPDATE_STEP = 5 # How many times perform optimizations in meta stage
 UPDATE_STEP_TEST = 50 # How many times perform optimization in finetuning stage (test)
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
-EPOCH = 1000 # How many epochs to run
+EPOCH = 30000 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/train-en-it" # Path to log the checkpointsmen
 RESTORE_PATH = None
 
@@ -104,6 +104,14 @@ num = sum(map(lambda x: np.prod(x.shape), tmp))
 print(maml)
 print('Total trainable tensors:', num)
 
+import pandas as pd   
+
+results = pd.DataFrame(columns = ['epoch','loss'])
+
+import os
+if(not os.isfile(args.log_path + '/results.csv')):
+    results.to_csv(args.log_path + '/results.csv', index = False)
+
 for step in range(args.epoch):
 
     print(f"Starting epoch {step}")
@@ -115,10 +123,10 @@ for step in range(args.epoch):
     # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
     accs = maml(x_spt, y_spt, x_qry, y_qry)
 
-    if step % 50 == 0:
+    if step % 500 == 0:
         print('step:', step, '\ttraining acc:', accs)
 
-    if step % 100 == 0:
+    if step % 5000 == 0:
         accs = []
         for _ in range(1000//args.task_num):
             # test
@@ -136,8 +144,16 @@ for step in range(args.epoch):
         print('Test acc:', accs) # Each position is the average test acc for each update_step_test (starting in no update i = 0)
 
     # Saving epoch checkpoint  
-    torch.save({
-            'model_state_dict': maml.net.state_dict(),
-            'loss': maml.loss,
-            'best_loss': maml.best_loss,
-            }, args.log_path + f'/checkpoint_epoch{step}_loss{maml.loss}.pth')
+    if step % 5000 == 0:
+        torch.save({
+                'model_state_dict': maml.net.state_dict(),
+                'loss': maml.loss,
+                'best_loss': maml.best_loss,
+                }, args.log_path + f'/checkpoint_epoch{step}_loss{maml.loss}.pth')
+
+    # Save to pandas csv aux
+    results = pd.read_csv(args.log_path + '/results.csv')
+    to_append = [step, maml.loss]
+    a_series = pd.Series(to_append, index = results.columns)
+    results = results.append(a_series, ignore_index=True)
+    results.to_csv(args.log_path + '/results.csv', index = False)
