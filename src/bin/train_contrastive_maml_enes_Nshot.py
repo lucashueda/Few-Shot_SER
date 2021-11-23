@@ -3,7 +3,7 @@ sys.path.append("/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto repr
 
 from src.dataloader.meta_loader import Dataloader4SER, NShotMAMLSampler, SERNShot
 from src.audio.audio import AudioProcessor
-from src.meta_learner.meta_learner import Meta
+from src.meta_learner.contrastive_meta_learner import Meta
 import torch.utils.data as data
 import torch
 import matplotlib.pyplot as plt
