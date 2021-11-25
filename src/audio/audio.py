@@ -551,6 +551,12 @@ class AudioProcessor(object):
             S = self._linear_to_mel(np.abs(D))
         return self.normalize(S).astype(np.float32)
 
+    def mfcc(self, y:np.ndarray) -> np.ndarray:
+        S = librosa.feature.melspectrogram(y, self.sample_rate, fmin = self.mel_fmin, fmax = self.mel_fmax,
+                                            hop_length = self.hop_length, n_fft = self.fft_size, n_mels = self.num_mels,)
+
+        return librosa.feature.mfcc(S = np.log(S + 1e6), n_mfcc= self.num_mels, htk=False).shape
+
     def inv_spectrogram(self, spectrogram: np.ndarray) -> np.ndarray:
         """Convert a spectrogram to a waveform using Griffi-Lim vocoder."""
         S = self.denormalize(spectrogram)
