@@ -52,6 +52,10 @@ ap = AudioProcessor(fft_size = 1024,
 nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 2, n_way = N_WAY, 
                 k_shot = K_SPT, k_query = K_QRY, pad_to = PAD_TO, pad_value = PAD_VALUE)
 
+
+print('experiment configs')
+
+print(f'k_shot = {nshot.k_shot}, k_query = {nshot.k_query}, n_way = {nshot.n_way}')
 # Defining args without argparse
 class ARGS:
     
