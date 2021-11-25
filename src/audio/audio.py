@@ -555,7 +555,7 @@ class AudioProcessor(object):
         S = librosa.feature.melspectrogram(y, self.sample_rate, fmin = self.mel_fmin, fmax = self.mel_fmax,
                                             hop_length = self.hop_length, n_fft = self.fft_size, n_mels = self.num_mels,)
 
-        return librosa.feature.mfcc(S = np.log(S + 1e6), n_mfcc= self.num_mels, htk=False).shape
+        return librosa.feature.mfcc(S = np.log(S + 1e6), n_mfcc= self.num_mels, htk=False)
 
     def inv_spectrogram(self, spectrogram: np.ndarray) -> np.ndarray:
         """Convert a spectrogram to a waveform using Griffi-Lim vocoder."""
