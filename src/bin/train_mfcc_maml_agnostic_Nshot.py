@@ -1,7 +1,7 @@
 import sys
 sys.path.append("/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/")
 
-from src.dataloader.meta_loader import Dataloader4SER, NShotMAMLSampler, SERNShot
+from src.dataloader.meta_loader_mfcc import Dataloader4SER, NShotMAMLSampler, SERNShot
 from src.audio.audio import AudioProcessor
 from src.meta_learner.meta_learner import Meta
 import torch.utils.data as data
@@ -14,8 +14,8 @@ PAD_TO = 200
 PAD_VALUE = -3
 TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
 TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/test.csv' # The same as training but with only data from the out-of-distribution language
-UPDATE_LR = 0.001 # Learning rate of fast weight optimizations
-META_LR = 0.001 # Learning rate of meta stage
+UPDATE_LR = 0.0001 # Learning rate of fast weight optimizations
+META_LR = 0.0001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
 K_SPT = 5 # How many examples per class for training (support set)
 K_QRY = 25 # How many example per class for validation (query set)
