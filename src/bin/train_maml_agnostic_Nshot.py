@@ -14,20 +14,20 @@ PAD_TO = 200
 PAD_VALUE = -3
 TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
 TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/test.csv' # The same as training but with only data from the out-of-distribution language
-UPDATE_LR = 0.01 # Learning rate of fast weight optimizations
-META_LR = 0.001 # Learning rate of meta stage
+UPDATE_LR = 0.0002 # Learning rate of fast weight optimizations
+META_LR = 0.000001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
 K_SPT = 5 # How many examples per class for training (support set)
-K_QRY = 20 # How many example per class for validation (query set)
+K_QRY = 25 # How many example per class for validation (query set)
 TASK_NUM = 16 # How many batches per sampling
-UPDATE_STEP = 5 # How many times perform optimizations in meta stage 
-UPDATE_STEP_TEST = 20 # How many times perform optimization in finetuning stage (test)
+UPDATE_STEP = 8 # How many times perform optimizations in meta stage 
+UPDATE_STEP_TEST = 8 # How many times perform optimization in finetuning stage (test)
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
-EPOCH = 2000 # How many epochs to run
+EPOCH = 6000 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic" # Path to log the checkpointsmen
 RESTORE_PATH = None
-STEPS_EARLY_STOP = 100
+STEPS_EARLY_STOP = 200
 
 device = 'cuda:0' # 'cpu' if dont have cuda
 
