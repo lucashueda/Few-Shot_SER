@@ -124,7 +124,7 @@ class Meta(nn.Module):
                 logits = self.net(x_spt[i], fast_weights, bn_training=True)
                 loss = F.cross_entropy(logits, y_spt[i])
                 # 2. compute grad on theta_pi
-                grad = torch.autograd.grad(loss, fast_weights)
+                grad = torch.autograd.grad(loss, fast_weights, create_graph = True)
                 # 3. theta_pi = theta_pi - train_lr * grad
                 fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
                 # 4. evaluation on query set
@@ -216,7 +216,7 @@ class Meta(nn.Module):
             logits = net(x_spt, fast_weights, bn_training=True)
             loss = F.cross_entropy(logits, y_spt)
             # 2. compute grad on theta_pi
-            grad = torch.autograd.grad(loss, fast_weights)
+            grad = torch.autograd.grad(loss, fast_weights, create_graph = True)
             # 3. theta_pi = theta_pi - train_lr * grad
             fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
 
