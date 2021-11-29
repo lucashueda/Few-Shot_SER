@@ -70,7 +70,7 @@ class Dataloader4SER(data.Dataset):
             mel = mel[:self.pad_to, :]
         else:
             N = self.pad_to - mel_lengths
-            zeros = np.ones((N,80))*self.pad_value
+            zeros = np.ones((N,20))*self.pad_value
             mel = np.concatenate((mel, zeros), axis = 0)
 
         # print(mel.shape)
