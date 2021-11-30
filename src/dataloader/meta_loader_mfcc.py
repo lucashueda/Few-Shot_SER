@@ -69,9 +69,14 @@ class Dataloader4SER(data.Dataset):
         if(mel_lengths >= self.pad_to):
             mel = mel[:self.pad_to, :]
         else:
-            N = self.pad_to - mel_lengths
-            zeros = np.ones((N,20))*self.pad_value
-            mel = np.concatenate((mel, zeros), axis = 0)
+            try:
+                N = self.pad_to - mel_lengths
+                zeros = np.ones((N,20))*self.pad_value
+                mel = np.concatenate((mel, zeros), axis = 0)
+            except:
+                N = self.pad_to - mel_lengths
+                zeros = np.ones((N,80))*self.pad_value
+                mel = np.concatenate((mel, zeros), axis = 0)
 
         # print(mel.shape)
 
