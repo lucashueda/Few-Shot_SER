@@ -11,10 +11,10 @@ import numpy as np
 
 # DEFINING EXPERIMENT PARAMETERS
 PAD_TO = 200 
-PAD_VALUE = -3
+PAD_VALUE = -1
 TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
 TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/test.csv' # The same as training but with only data from the out-of-distribution language
-UPDATE_LR = 0.001 # Learning rate of fast weight optimizations
+UPDATE_LR = 0.05 # Learning rate of fast weight optimizations
 META_LR = 0.001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
 K_SPT = 5 # How many examples per class for training (support set)
@@ -24,7 +24,7 @@ UPDATE_STEP = 8 # How many times perform optimizations in meta stage
 UPDATE_STEP_TEST = 8 # How many times perform optimization in finetuning stage (test)
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
-EPOCH = 6000 # How many epochs to run
+EPOCH = 4000 # How many epochs to run
 LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic" # Path to log the checkpointsmen
 RESTORE_PATH = None
 STEPS_EARLY_STOP = 200
@@ -32,14 +32,14 @@ STEPS_EARLY_STOP = 200
 device = 'cuda:0' # 'cpu' if dont have cuda
 
 # Defining the audio processor
-ap = AudioProcessor(fft_size = 1024,
-                    hop_length = 256,
-                    win_length = 1024,
+ap = AudioProcessor(fft_size = 512,
+                    hop_length = 128,
+                    win_length = 512,
                     pad_wav=False,
                     num_mels = 80,
                     mel_fmin = 80,
                     mel_fmax = 7600,
-                    sample_rate = 22050,
+                    sample_rate = 16000,
                     duration = None,
                     resample = True,
                     signal_norm= True,
@@ -49,7 +49,7 @@ ap = AudioProcessor(fft_size = 1024,
                     max_norm = 4)
 
 # Defining the dataloader for MAML
-nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 2, n_way = N_WAY, 
+nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 4, n_way = N_WAY, 
                 k_shot = K_SPT, k_query = K_QRY, pad_to = PAD_TO, pad_value = PAD_VALUE)
 
 
@@ -123,12 +123,12 @@ for step in range(args.epoch):
     # set traning=True to update running_mean, running_variance, bn_weights, bn_bias
     accs = maml(x_spt, y_spt, x_qry, y_qry)
 
-    if step % 500 == 0:
+    if step % 100 == 0:
         print('step:', step, '\ttraining acc:', accs)
 
-    if step % 1000 == 0:
+    if step % 500 == 0:
         accs = []
-        for _ in range(1000//args.task_num):
+        for _ in range(100//args.task_num):
             # test
             x_spt, y_spt, x_qry, y_qry = nshot.next('test')
             x_spt, y_spt, x_qry, y_qry = torch.from_numpy(x_spt).to(device), torch.from_numpy(y_spt).type(torch.LongTensor).to(device), \
