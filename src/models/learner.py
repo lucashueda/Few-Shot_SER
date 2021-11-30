@@ -1,6 +1,6 @@
 import  torch
-from    torch import nn
-from    torch.nn import functional as F
+from torch import nn
+from torch.nn import functional as F
 import  numpy as np
 
 class Learner(nn.Module):
@@ -285,3 +285,42 @@ class Learner(nn.Module):
         :return:
         """
         return self.vars
+
+
+class Net(nn.Module):
+    """
+    The base CNN model for MAML for few-shot learning.
+    The architecture is same as of the embedding in MatchingNet.
+    """
+
+    def __init__(self, num_classes):
+        """
+        self.net returns:
+            [N, 64, 1, 1] for Omniglot (28x28)
+            [N, 64, 5, 5] for miniImageNet (84x84)
+        self.fc returns:
+            [N, num_classes]
+        
+        Args:
+            in_channels: number of input channels feeding into first conv_block
+            num_classes: number of classes for the task
+            dataset: for the measure of input units for self.fc, caused by 
+                     difference of input size of 'Omniglot' and 'ImageNet'
+        """
+        super(Net, self).__init__()
+        self.lstm_1 = nn.LSTM(20, 128 , batch_first = True)
+        self.lstm_2 = nn.LSTM(128, 128 , batch_first = True)
+        self.hidden = nn.Linear(128, 128)
+        self.hidden2targ = nn.Linear(128, num_classes)
+
+    def forward(self, X, params=None):
+        self.lstm_1.flatten_parameters()
+        lstm_out ,_ = self.lstm_1(X)
+        self.lstm_2.flatten_parameters()
+        _ ,(lstm_out, _) = self.lstm_2(lstm_out)
+        lstm_out = lstm_out[-1]
+        hidden_output = self.hidden(lstm_out)
+        #hidden_output = F.relu(hidden_output)
+        out = self.hidden2targ(hidden_output)
+        # out = F.log_softmax(out, dim=1)
+        return out
