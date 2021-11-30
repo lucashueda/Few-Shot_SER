@@ -76,7 +76,7 @@ class Meta(nn.Module):
         :param y_qry:   [b, querysz]
         :return:
         """
-        task_num, setsz, c_, h, w = x_spt.size()
+        task_num, setsz, h, w = x_spt.size()
         querysz = x_qry.size(1)
 
         # List of Losses and Accs on the Query Set across Tasks
@@ -179,7 +179,7 @@ class Meta(nn.Module):
         :param y_qry:   [querysz]
         :return:
         """
-        assert len(x_spt.shape) == 4
+        assert len(x_spt.shape) == 3
         querysz = x_qry.size(0)
 
         corrects = [0 for _ in range(self.update_step_test + 1)]
