@@ -31,6 +31,8 @@ STEPS_EARLY_STOP = 200
 
 device = 'cuda:0' # 'cpu' if dont have cuda
 
+torch.autograd.set_detect_anomaly(True)
+
 # Defining the audio processor
 ap = AudioProcessor(fft_size = 512,
                     hop_length = 128,
