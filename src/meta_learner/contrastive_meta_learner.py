@@ -95,7 +95,7 @@ class Meta(nn.Module):
             loss = F.cross_entropy(logits, y_spt[i])
             contrastive_loss = self.contrastive_lf(embeddings, y_spt[i])
 
-            grad = torch.autograd.grad(contrastive_loss, self.net.parameters(), allow_unused=True)
+            grad = torch.autograd.grad(contrastive_loss + loss, self.net.parameters())
 
             # Update Parameters
             fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, self.net.parameters())))
@@ -134,7 +134,7 @@ class Meta(nn.Module):
                 contrastive_loss = self.contrastive_lf(embeddings, y_spt[i])
                 # loss = F.cross_entropy(logits, y_spt[i])
                 # 2. compute grad on theta_pi
-                grad = torch.autograd.grad(contrastive_loss, fast_weights, allow_unused=True)
+                grad = torch.autograd.grad(loss + contrastive_loss, fast_weights)
                 # 3. theta_pi = theta_pi - train_lr * grad
                 fast_weights = list(map(lambda p: p[1] - self.update_lr * p[0], zip(grad, fast_weights)))
                 # 4. evaluation on query set
