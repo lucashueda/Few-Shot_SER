@@ -19,7 +19,7 @@ META_LR = 0.001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
 K_SPT = 5 # How many examples per class for training (support set)
 K_QRY = 25 # How many example per class for validation (query set)
-TASK_NUM = 16 # How many batches per sampling
+TASK_NUM = 8 # How many batches per sampling
 UPDATE_STEP = 8 # How many times perform optimizations in meta stage 
 UPDATE_STEP_TEST = 8 # How many times perform optimization in finetuning stage (test)
 MEL_DIM = 80 # MEL DIM 
@@ -49,7 +49,7 @@ ap = AudioProcessor(fft_size = 512,
                     max_norm = 4)
 
 # Defining the dataloader for MAML
-nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 2, n_way = N_WAY, 
+nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 4, n_way = N_WAY, 
                 k_shot = K_SPT, k_query = K_QRY, pad_to = PAD_TO, pad_value = PAD_VALUE)
 
 
