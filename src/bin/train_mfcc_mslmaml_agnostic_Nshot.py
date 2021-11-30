@@ -10,24 +10,24 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # DEFINING EXPERIMENT PARAMETERS
-PAD_TO = 100
+PAD_TO = 200
 PAD_VALUE = -3
-TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
-TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic/test.csv' # The same as training but with only data from the out-of-distribution language
+TRAIN_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic_msl/train.csv' # The path to a csv file with "wav_path" and "emotion" columns, for training (only two languages)
+TEST_DF = '/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic_msl/test.csv' # The same as training but with only data from the out-of-distribution language
 UPDATE_LR = 0.05 # Learning rate of fast weight optimizations
-META_LR = 0.0001 # Learning rate of meta stage
+META_LR = 0.001 # Learning rate of meta stage
 N_WAY = 5 # How many classes
-K_SPT = 10 # How many examples per class for training (support set)
+K_SPT = 5 # How many examples per class for training (support set)
 K_QRY = 25 # How many example per class for validation (query set)
 TASK_NUM = 16 # How many batches per sampling
 UPDATE_STEP = 8 # How many times perform optimizations in meta stage 
 UPDATE_STEP_TEST = 8 # How many times perform optimization in finetuning stage (test)
-MEL_DIM = 20 # MEL DIM 
+MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
-EPOCH = 10000 # How many epochs to run
-LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic" # Path to log the checkpointsmen
+EPOCH = 2000 # How many epochs to run
+LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic_msl" # Path to log the checkpointsmen
 RESTORE_PATH = None
-STEPS_EARLY_STOP = 300
+STEPS_EARLY_STOP = 200
 
 device = 'cuda:0' # 'cpu' if dont have cuda
 
@@ -49,7 +49,7 @@ ap = AudioProcessor(fft_size = 512,
                     max_norm = 4)
 
 # Defining the dataloader for MAML
-nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 2, n_way = N_WAY, 
+nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 4, n_way = N_WAY, 
                 k_shot = K_SPT, k_query = K_QRY, pad_to = PAD_TO, pad_value = PAD_VALUE)
 
 
@@ -79,17 +79,24 @@ args = ARGS()
 
 # Defining the config of the model
 
+# Defining the config of the model
 config = [
-        ('conv2d', [256, 1, 3, 3, 2, 1]),
+        ('conv2d', [64, 1, 3, 3, 2, 1]),
         ('relu', [True]),
-        ('bn', [256]),
-        ('conv2d', [256, 256, 3, 3, 2, 1]),
+        ('bn', [64]),
+        ('conv2d', [64, 64, 3, 3, 2, 1]),
         ('relu', [True]),
-        ('bn', [256]),
+        ('bn', [64]),
+        ('conv2d', [64, 64, 3, 3, 2, 1]),
+        ('relu', [True]),
+        ('bn', [64]),
+        ('conv2d', [64, 64, 3, 3, 2, 1]),
+        ('relu', [True]),
+        ('bn', [64]),
         ('flatten', []),
-        ('linear', [4160,128000]),
         ('linear', [args.n_way, 4160])
     ]
+
 
 
 # Loading meta
