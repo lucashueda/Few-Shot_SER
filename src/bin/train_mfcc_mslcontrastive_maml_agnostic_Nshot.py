@@ -25,7 +25,7 @@ UPDATE_STEP_TEST = 8 # How many times perform optimization in finetuning stage (
 MEL_DIM = 80 # MEL DIM 
 CHANNEL = 1 # Fixed
 EPOCH = 2000 # How many epochs to run
-LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/msl_agnostic_contrastive" # Path to log the checkpointsmen
+LOG_PATH = "/content/drive/Shareddrives/ESS_Unicamp_CPqD/SER - projeto representation learning/Few-Shot_SER/experiments/agnostic_msl_contrastive" # Path to log the checkpointsmen
 RESTORE_PATH = None
 STEPS_EARLY_STOP = 200
 
