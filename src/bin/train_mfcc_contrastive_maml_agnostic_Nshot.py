@@ -49,7 +49,7 @@ ap = AudioProcessor(fft_size = 512,
                     max_norm = 4)
 
 # Defining the dataloader for MAML
-nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 4, n_way = N_WAY, 
+nshot = SERNShot(df_train_path = TRAIN_DF, df_test_path = TEST_DF, ap = ap, batch_size = 2, n_way = N_WAY, 
                 k_shot = K_SPT, k_query = K_QRY, pad_to = PAD_TO, pad_value = PAD_VALUE)
 
 
