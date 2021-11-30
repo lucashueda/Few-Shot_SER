@@ -41,7 +41,7 @@ class Meta(nn.Module):
 
         self.meta_optim = optim.Adam(self.net.parameters(), lr=self.meta_lr)
 
-
+        self.low_dict = self.net.state_dict()
 
     def clip_grad_by_norm_(self, grad, max_norm):
         """
@@ -85,9 +85,9 @@ class Meta(nn.Module):
         weights = [0.1*i for i in range(self.update_step + 1)]
 
         # Copy of the local net
-        net = deepcopy(self.net)
+        # net = deepcopy(self.net)
 
-        optim = torch.optim.SGD(net.parameters(), lr=self.update_lr)
+        optim = torch.optim.SGD(self.net.parameters(), lr=self.update_lr)
 
         for i in range(task_num):
             
@@ -111,7 +111,7 @@ class Meta(nn.Module):
             # Calculate Loss and Acc on Query Set after Updating
             with torch.no_grad():
                 # [setsz, nway]
-                logits_q = net(x_qry[i])
+                logits_q = self.net(x_qry[i])
                 loss_q = F.cross_entropy(logits_q, y_qry[i])
                 losses_q[1] += loss_q
                 # [setsz]
@@ -121,7 +121,7 @@ class Meta(nn.Module):
 
             for k in range(1, self.update_step):
                 # 1. run the i-th task and compute loss for k=1~K-1
-                logits = net(x_spt[i])
+                logits = self.net(x_spt[i])
                 loss = F.cross_entropy(logits, y_spt[i])
                 # 2. compute grad on theta_pi
                 # 3. theta_pi = theta_pi - train_lr * grad
@@ -129,7 +129,7 @@ class Meta(nn.Module):
                 loss.backward()
                 optim.step()
                 # 4. evaluation on query set
-                logits_q = net(x_qry[i])
+                logits_q = self.net(x_qry[i])
                 loss_q = F.cross_entropy(logits_q, y_qry[i])
                 losses_q[k + 1] += loss_q
                 with torch.no_grad():
@@ -143,11 +143,14 @@ class Meta(nn.Module):
         # loss_q = losses_q[-1] / task_num
         loss_q = (sum([losses_q[i]*weights[i] for i in range(len(losses_q))])/sum(weights))/task_num
         
-        
+        self.net.load_state_dict(self.low_dict)
+
         self.meta_optim.zero_grad()
         loss_q.backward()
         self.meta_optim.step()
 
+        self.low_dict = self.net.state_dict()
+        
         # Saving checkpoint
         self.loss = loss_q 
         
